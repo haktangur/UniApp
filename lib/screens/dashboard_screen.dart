@@ -3,6 +3,7 @@ import '../widgets/pixel_card.dart';
 import '../widgets/mascot_widget.dart';
 import 'pomodoro_screen.dart';
 import 'gpa_screen.dart';
+import 'calendar_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -46,6 +47,13 @@ class DashboardScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const GpaScreen(),
+                              ),
+                            )
+                          : card['title'] == 'Takvim'
+                          ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CalendarScreen(),
                               ),
                             )
                           : () {},
