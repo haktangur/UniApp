@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/pixel_card.dart';
 import '../widgets/mascot_widget.dart';
+import 'pomodoro_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -32,7 +33,14 @@ class DashboardScreen extends StatelessWidget {
                       title: card['title']!,
                       icon: card['icon']!,
                       preview: card['preview']!,
-                      onTap: () {},
+                      onTap: card['title'] == 'Pomodoro'
+                          ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PomodoroScreen(),
+                              ),
+                            )
+                          : () {},
                     );
                   }).toList(),
                 ),
