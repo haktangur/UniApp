@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme/pixel_theme.dart';
+import 'screens/dashboard_screen.dart';
 
 void main() {
   runApp(const UniApp());
@@ -14,16 +15,7 @@ class UniApp extends StatelessWidget {
       title: 'UniApp',
       debugShowCheckedModeBanner: false,
       theme: PixelTheme.theme,
-      home: Scaffold(
-        body: Center(
-          child: Text(
-            '> UniApp <',
-            style: Theme.of(
-              context,
-            ).textTheme.displayLarge?.copyWith(color: PixelTheme.primary),
-          ),
-        ),
-      ),
+      home: const DashboardScreen(),
     );
   }
 }
