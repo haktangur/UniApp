@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/pixel_theme.dart';
 
-class PixelCard extends StatelessWidget {
+class PixelCard extends StatefulWidget {
   final String title;
   final String icon;
   final String preview;
@@ -16,35 +16,63 @@ class PixelCard extends StatelessWidget {
   });
 
   @override
+  State<PixelCard> createState() => _PixelCardState();
+}
+
+class _PixelCardState extends State<PixelCard> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 60),
+        transform: Matrix4.translationValues(
+          _pressed ? 1 : 0,
+          _pressed ? 1 : 0,
+          0,
+        ),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: PixelTheme.cardBackground,
-          border: Border.all(color: PixelTheme.border),
+          border: Border.all(
+            color: _pressed ? PixelTheme.primary : PixelTheme.border,
+            width: 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 24)),
-            const SizedBox(height: 8),
+            Text(widget.icon, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 10),
             Text(
-              title,
+              widget.title,
               style: const TextStyle(
                 color: PixelTheme.primary,
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1,
+                letterSpacing: 1.5,
               ),
             ),
             const Spacer(),
+            Container(
+              width: double.infinity,
+              height: 1,
+              color: PixelTheme.border,
+            ),
+            const SizedBox(height: 6),
             Text(
-              preview,
+              widget.preview,
               style: const TextStyle(
                 color: PixelTheme.textSecondary,
-                fontSize: 11,
+                fontSize: 10,
+                letterSpacing: 0.5,
               ),
             ),
           ],
