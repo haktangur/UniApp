@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../state/stats_state.dart';
-import '../theme/pixel_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../state/app_state.dart';
+import '../state/stats_state.dart';
+import '../theme/pixel_theme.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -33,7 +33,6 @@ class StatsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Özet kartlar
             Row(
               children: [
                 _StatCard(
@@ -66,13 +65,11 @@ class StatsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            // Bar chart
             _PixelBarChart(
               data: state.weeklyData,
               maxMinutes: state.maxMinutes,
             ),
             const SizedBox(height: 28),
-            // Günlük detay listesi
             const Text(
               'Günlük Detay',
               style: TextStyle(
@@ -83,47 +80,57 @@ class StatsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: ListView.builder(
-                itemCount: state.weeklyData.length,
-                itemBuilder: (context, i) {
-                  final d = state.weeklyData[i];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: PixelTheme.cardBackground,
-                      border: Border.all(color: PixelTheme.border),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          d.label,
-                          style: const TextStyle(
-                            color: PixelTheme.textSecondary,
-                            fontSize: 13,
-                          ),
+              child: state.totalMinutes == 0
+                  ? const Center(
+                      child: Text(
+                        'Henüz çalışma kaydı yok.',
+                        style: TextStyle(
+                          color: PixelTheme.textSecondary,
+                          fontSize: 12,
                         ),
-                        Text(
-                          d.minutes == 0
-                              ? '-'
-                              : '${d.minutes ~/ 60 > 0 ? "${d.minutes ~/ 60}s " : ""}${d.minutes % 60}dk',
-                          style: TextStyle(
-                            color: d.minutes > 0
-                                ? PixelTheme.primary
-                                : PixelTheme.border,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: state.weeklyData.length,
+                      itemBuilder: (context, i) {
+                        final d = state.weeklyData[i];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
                           ),
-                        ),
-                      ],
+                          decoration: BoxDecoration(
+                            color: PixelTheme.cardBackground,
+                            border: Border.all(color: PixelTheme.border),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                d.label,
+                                style: const TextStyle(
+                                  color: PixelTheme.textSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text(
+                                d.minutes == 0
+                                    ? '-'
+                                    : '${d.minutes ~/ 60 > 0 ? "${d.minutes ~/ 60}s " : ""}${d.minutes % 60}dk',
+                                style: TextStyle(
+                                  color: d.minutes > 0
+                                      ? PixelTheme.primary
+                                      : PixelTheme.border,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
