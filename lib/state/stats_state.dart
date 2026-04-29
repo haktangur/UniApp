@@ -37,16 +37,14 @@ class StatsState extends ChangeNotifier {
   }
 
   void _save() {
+    // Haftalık veriyi kaydet
     final map = {for (final d in weeklyData) d.label: d.minutes};
     StorageService.stats.put('weekly', map);
 
+    // Günlük log — weeklyData'dan al, birikimli toplama yapma
     final todayKey = _todayKey();
-    final current = StorageService.stats.get(todayKey) ?? 0;
     final todayIndex = DateTime.now().weekday - 1;
-    StorageService.stats.put(
-      todayKey,
-      current + weeklyData[todayIndex].minutes,
-    );
+    StorageService.stats.put(todayKey, weeklyData[todayIndex].minutes);
   }
 
   String _todayKey() {

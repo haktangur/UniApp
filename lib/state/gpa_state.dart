@@ -22,7 +22,7 @@ class Course {
 }
 
 class GpaState extends ChangeNotifier {
-  final List<Course> courses = [Course()];
+  final List<Course> courses = [];
 
   void loadFromStorage(List<CourseModel> loaded) {
     courses
