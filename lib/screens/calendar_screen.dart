@@ -375,7 +375,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (_view == CalendarView.day) {
       title = '${_months[_viewMonth.month - 1]} ${_viewMonth.year}';
     } else if (_view == CalendarView.month) {
-      title = '${_viewYear}';
+      title = '$_viewYear';
     } else {
       title = 'Yıl Seç';
     }
