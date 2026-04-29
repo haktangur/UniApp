@@ -2,22 +2,28 @@ import 'package:flutter/material.dart';
 
 class DayStats {
   final String label;
-  final int minutes;
+  int minutes;
 
-  const DayStats({required this.label, required this.minutes});
+  DayStats({required this.label, this.minutes = 0});
 }
 
 class StatsState extends ChangeNotifier {
-  // Pomodoro bağlandığında bu liste oradan güncellenecek
   final List<DayStats> weeklyData = [
-    const DayStats(label: 'Pt', minutes: 50),
-    const DayStats(label: 'Sa', minutes: 75),
-    const DayStats(label: 'Ça', minutes: 25),
-    const DayStats(label: 'Pe', minutes: 100),
-    const DayStats(label: 'Cu', minutes: 60),
-    const DayStats(label: 'Ct', minutes: 0),
-    const DayStats(label: 'Pz', minutes: 40),
+    DayStats(label: 'Pt'),
+    DayStats(label: 'Sa'),
+    DayStats(label: 'Ça'),
+    DayStats(label: 'Pe'),
+    DayStats(label: 'Cu'),
+    DayStats(label: 'Ct'),
+    DayStats(label: 'Pz'),
   ];
+
+  // Pomodoro her seans bittiğinde bunu çağırır
+  void addMinutes(int minutes) {
+    final day = DateTime.now().weekday - 1; // 0=Pt, 6=Pz
+    weeklyData[day].minutes += minutes;
+    notifyListeners();
+  }
 
   int get streak {
     int count = 0;
@@ -38,6 +44,8 @@ class StatsState extends ChangeNotifier {
     return h > 0 ? '${h}s ${m}dk' : '${m}dk';
   }
 
-  int get maxMinutes =>
-      weeklyData.map((d) => d.minutes).reduce((a, b) => a > b ? a : b);
+  int get maxMinutes {
+    if (weeklyData.every((d) => d.minutes == 0)) return 1;
+    return weeklyData.map((d) => d.minutes).reduce((a, b) => a > b ? a : b);
+  }
 }

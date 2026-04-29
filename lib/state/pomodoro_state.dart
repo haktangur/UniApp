@@ -12,6 +12,11 @@ class PomodoroState extends ChangeNotifier {
   bool isRunning = false;
   Timer? _timer;
 
+  // Stats'a bağlanmak için — app_state.dart setter ile atar
+  void Function(int minutes)? onSessionComplete;
+  // Pomodoro ekranındaki snackbar için
+  VoidCallback? onComplete;
+
   double get progress => 1 - (secondsLeft / _totalSeconds);
   int get _totalSeconds =>
       mode == PomodoroMode.focus ? focusDuration : breakDuration;
@@ -48,10 +53,14 @@ class PomodoroState extends ChangeNotifier {
     notifyListeners();
   }
 
-  VoidCallback? onComplete;
-
   void _switchMode() {
     _timer?.cancel();
+
+    // Odak seansı bittiyse dakikaları stats'a bildir
+    if (mode == PomodoroMode.focus) {
+      onSessionComplete?.call(focusDuration ~/ 60);
+    }
+
     onComplete?.call();
     mode = mode == PomodoroMode.focus
         ? PomodoroMode.breakTime

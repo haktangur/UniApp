@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../state/stats_state.dart';
 import '../theme/pixel_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../state/app_state.dart';
 
-class StatsScreen extends StatelessWidget {
+class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final state = StatsState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(statsProvider);
 
     return Scaffold(
       appBar: AppBar(

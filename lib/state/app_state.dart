@@ -4,21 +4,20 @@ import 'stats_state.dart';
 
 enum MascotMood { idle, focusing, happy, sad }
 
-class AppState {
-  final MascotMood mood;
-  final PomodoroState pomodoro;
-  final StatsState stats;
+// Tek provider instance — tüm uygulama aynı state'i kullanır
+final pomodoroProvider = ChangeNotifierProvider((ref) {
+  final pomodoro = PomodoroState();
+  final stats = ref.read(statsProvider);
 
-  const AppState({
-    required this.mood,
-    required this.pomodoro,
-    required this.stats,
-  });
-}
+  // Pomodoro seans bitince stats'a yaz
+  pomodoro.onSessionComplete = (minutes) => stats.addMinutes(minutes);
 
-final pomodoroProvider = ChangeNotifierProvider((ref) => PomodoroState());
+  return pomodoro;
+});
+
 final statsProvider = ChangeNotifierProvider((ref) => StatsState());
 
+// Mascot mood — stats ve pomodoro'dan türetiliyor, kendi state'i yok
 final mascotMoodProvider = Provider((ref) {
   final pomodoro = ref.watch(pomodoroProvider);
   final stats = ref.watch(statsProvider);
