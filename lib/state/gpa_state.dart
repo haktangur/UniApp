@@ -50,6 +50,7 @@ class GpaState extends ChangeNotifier {
   }
 
   void updateName(int index, String name) {
+    if (courses[index].name == name) return;
     courses[index].name = name;
     _save();
   }
@@ -61,6 +62,7 @@ class GpaState extends ChangeNotifier {
   }
 
   void updateCredit(int index, int credit) {
+    if (courses[index].credit == credit) return;
     courses[index].credit = credit;
     _save();
   }

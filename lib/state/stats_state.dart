@@ -20,11 +20,13 @@ class StatsState extends ChangeNotifier {
   ];
 
   void loadFromStorage(Map raw) {
-    for (final day in weeklyData) {
-      final saved = raw[day.label];
-      if (saved != null) day.minutes = saved as int;
-    }
-    notifyListeners();
+    try {
+      for (final day in weeklyData) {
+        final saved = raw[day.label];
+        if (saved is int) day.minutes = saved;
+      }
+      notifyListeners();
+    } catch (_) {}
   }
 
   void addMinutes(int minutes) {

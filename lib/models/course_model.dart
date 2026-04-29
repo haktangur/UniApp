@@ -15,9 +15,11 @@ class CourseModel {
     'credit': credit,
   };
 
-  factory CourseModel.fromMap(Map map) => CourseModel(
-    name: map['name'] ?? '',
-    grade: map['grade'] ?? 'AA',
-    credit: map['credit'] ?? 3,
-  );
+  factory CourseModel.fromMap(Map map) {
+    return CourseModel(
+      name: (map['name'] as String?) ?? '',
+      grade: (map['grade'] as String?) ?? 'AA',
+      credit: (map['credit'] as int?) ?? 3,
+    );
+  }
 }

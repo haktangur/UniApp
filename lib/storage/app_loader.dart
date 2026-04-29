@@ -14,24 +14,33 @@ final appLoaderProvider = FutureProvider<void>((ref) async {
 });
 
 Future<void> _loadGpa(GpaState state) async {
-  final box = StorageService.gpa;
-  final raw = box.get('courses');
-  if (raw == null) return;
-  final list = (raw as List).map((e) => CourseModel.fromMap(e)).toList();
-  state.loadFromStorage(list);
+  try {
+    final raw = StorageService.gpa.get('courses');
+    if (raw == null || raw is! List || raw.isEmpty) return;
+    final list = raw
+        .whereType<Map>()
+        .map((e) => CourseModel.fromMap(e))
+        .toList();
+    if (list.isNotEmpty) state.loadFromStorage(list);
+  } catch (_) {}
 }
 
 Future<void> _loadCalendar(CalendarState state) async {
-  final box = StorageService.calendar;
-  final raw = box.get('events');
-  if (raw == null) return;
-  final list = (raw as List).map((e) => EventModel.fromMap(e)).toList();
-  state.loadFromStorage(list);
+  try {
+    final raw = StorageService.calendar.get('events');
+    if (raw == null || raw is! List || raw.isEmpty) return;
+    final list = raw
+        .whereType<Map>()
+        .map((e) => EventModel.fromMap(e))
+        .toList();
+    if (list.isNotEmpty) state.loadFromStorage(list);
+  } catch (_) {}
 }
 
 Future<void> _loadStats(StatsState state) async {
-  final box = StorageService.stats;
-  final raw = box.get('weekly');
-  if (raw == null) return;
-  state.loadFromStorage(raw as Map);
+  try {
+    final raw = StorageService.stats.get('weekly');
+    if (raw == null || raw is! Map || raw.isEmpty) return;
+    state.loadFromStorage(raw);
+  } catch (_) {}
 }
