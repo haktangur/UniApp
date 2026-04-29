@@ -55,12 +55,11 @@ class PomodoroState extends ChangeNotifier {
 
   void _switchMode() {
     _timer?.cancel();
-
-    // Odak seansı bittiyse dakikaları stats'a bildir
     if (mode == PomodoroMode.focus) {
-      onSessionComplete?.call(focusDuration ~/ 60);
+      final elapsed = focusDuration - secondsLeft;
+      final minutes = (elapsed / 60).ceil();
+      if (minutes > 0) onSessionComplete?.call(minutes);
     }
-
     onComplete?.call();
     mode = mode == PomodoroMode.focus
         ? PomodoroMode.breakTime

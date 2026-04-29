@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../storage/storage_service.dart';
 
 class DayStats {
   final String label;
@@ -18,19 +19,42 @@ class StatsState extends ChangeNotifier {
     DayStats(label: 'Pz'),
   ];
 
-  // Pomodoro her seans bittiğinde bunu çağırır
-  void addMinutes(int minutes) {
-    final day = DateTime.now().weekday - 1; // 0=Pt, 6=Pz
-    weeklyData[day].minutes += minutes;
-    notifyListeners();
-  }
-
   void loadFromStorage(Map raw) {
     for (final day in weeklyData) {
       final saved = raw[day.label];
       if (saved != null) day.minutes = saved as int;
     }
     notifyListeners();
+  }
+
+  void addMinutes(int minutes) {
+    final index = DateTime.now().weekday - 1;
+    weeklyData[index].minutes += minutes;
+    _save();
+    notifyListeners();
+  }
+
+  void _save() {
+    final map = {for (final d in weeklyData) d.label: d.minutes};
+    StorageService.stats.put('weekly', map);
+
+    final todayKey = _todayKey();
+    final current = StorageService.stats.get(todayKey) ?? 0;
+    final todayIndex = DateTime.now().weekday - 1;
+    StorageService.stats.put(
+      todayKey,
+      current + weeklyData[todayIndex].minutes,
+    );
+  }
+
+  String _todayKey() {
+    final now = DateTime.now();
+    return 'day_${now.year}_${now.month}_${now.day}';
+  }
+
+  int minutesForDate(DateTime date) {
+    final key = 'day_${date.year}_${date.month}_${date.day}';
+    return StorageService.stats.get(key) ?? 0;
   }
 
   int get streak {
