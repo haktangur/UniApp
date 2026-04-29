@@ -48,8 +48,11 @@ class PomodoroState extends ChangeNotifier {
     notifyListeners();
   }
 
+  VoidCallback? onComplete;
+
   void _switchMode() {
     _timer?.cancel();
+    onComplete?.call();
     mode = mode == PomodoroMode.focus
         ? PomodoroMode.breakTime
         : PomodoroMode.focus;

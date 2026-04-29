@@ -5,6 +5,7 @@ import '../state/pomodoro_state.dart';
 import '../widgets/pixel_button.dart';
 import '../widgets/pixel_progress_bar.dart';
 import '../theme/pixel_theme.dart';
+import 'package:flutter/services.dart';
 
 class PomodoroScreen extends ConsumerWidget {
   const PomodoroScreen({super.key});
@@ -12,6 +13,29 @@ class PomodoroScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(pomodoroProvider);
+    ref.listen(pomodoroProvider, (prev, next) {
+      if (prev?.mode != next.mode) {
+        HapticFeedback.heavyImpact();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: PixelTheme.cardBackground,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              next.mode == PomodoroMode.focus
+                  ? '> MOLA BİTTİ. ODAKLAN.'
+                  : '> SEANS BİTTİ. MOL VER.',
+              style: const TextStyle(
+                color: PixelTheme.primary,
+                fontFamily: 'Courier',
+                fontSize: 12,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+        );
+      }
+    });
     final isFocus = state.mode == PomodoroMode.focus;
     final bgColor = isFocus ? PixelTheme.background : const Color(0xFF0D1A0D);
     final accentColor = isFocus ? PixelTheme.primary : PixelTheme.secondary;
