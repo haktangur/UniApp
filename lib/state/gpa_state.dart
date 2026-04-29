@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
+import '../storage/storage_service.dart';
 
 const Map<String, double> gradePoints = {
   'AA': 4.0,
@@ -23,18 +24,6 @@ class Course {
 class GpaState extends ChangeNotifier {
   final List<Course> courses = [Course()];
 
-  void addCourse() {
-    courses.add(Course());
-    notifyListeners();
-  }
-
-  void removeCourse(int index) {
-    if (courses.length > 1) {
-      courses.removeAt(index);
-      notifyListeners();
-    }
-  }
-
   void loadFromStorage(List<CourseModel> loaded) {
     courses
       ..clear()
@@ -46,19 +35,34 @@ class GpaState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addCourse() {
+    courses.add(Course());
+    _save();
+    notifyListeners();
+  }
+
+  void removeCourse(int index) {
+    if (courses.length > 1) {
+      courses.removeAt(index);
+      _save();
+      notifyListeners();
+    }
+  }
+
   void updateName(int index, String name) {
     courses[index].name = name;
-    notifyListeners();
+    _save();
   }
 
   void updateGrade(int index, String grade) {
     courses[index].grade = grade;
+    _save();
     notifyListeners();
   }
 
   void updateCredit(int index, int credit) {
     courses[index].credit = credit;
-    notifyListeners();
+    _save();
   }
 
   double get gpa {
@@ -70,5 +74,18 @@ class GpaState extends ChangeNotifier {
     }
     if (totalCredits == 0) return 0;
     return totalPoints / totalCredits;
+  }
+
+  void _save() {
+    final list = courses
+        .map(
+          (c) => CourseModel(
+            name: c.name,
+            grade: c.grade,
+            credit: c.credit,
+          ).toMap(),
+        )
+        .toList();
+    StorageService.gpa.put('courses', list);
   }
 }
