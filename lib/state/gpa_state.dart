@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/course_model.dart';
 
 const Map<String, double> gradePoints = {
   'AA': 4.0,
@@ -32,6 +33,17 @@ class GpaState extends ChangeNotifier {
       courses.removeAt(index);
       notifyListeners();
     }
+  }
+
+  void loadFromStorage(List<CourseModel> loaded) {
+    courses
+      ..clear()
+      ..addAll(
+        loaded.map(
+          (c) => Course(name: c.name, grade: c.grade, credit: c.credit),
+        ),
+      );
+    notifyListeners();
   }
 
   void updateName(int index, String name) {

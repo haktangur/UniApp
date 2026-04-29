@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/event_model.dart';
 
 class CalendarState extends ChangeNotifier {
   DateTime selectedDay = DateTime.now();
@@ -10,6 +11,14 @@ class CalendarState extends ChangeNotifier {
 
   void selectDay(DateTime d) {
     selectedDay = d;
+    notifyListeners();
+  }
+
+  void loadFromStorage(List<EventModel> loaded) {
+    _events.clear();
+    for (final e in loaded) {
+      _events.putIfAbsent(e.dateKey, () => []).add(e.title);
+    }
     notifyListeners();
   }
 

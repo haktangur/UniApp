@@ -1,23 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pomodoro_state.dart';
 import 'stats_state.dart';
+import 'gpa_state.dart';
+import 'calendar_state.dart';
 
 enum MascotMood { idle, focusing, resting, happy, sad }
 
-// Tek provider instance — tüm uygulama aynı state'i kullanır
 final pomodoroProvider = ChangeNotifierProvider((ref) {
   final pomodoro = PomodoroState();
   final stats = ref.read(statsProvider);
-
-  // Pomodoro seans bitince stats'a yaz
   pomodoro.onSessionComplete = (minutes) => stats.addMinutes(minutes);
-
   return pomodoro;
 });
 
 final statsProvider = ChangeNotifierProvider((ref) => StatsState());
+final gpaProvider = ChangeNotifierProvider((ref) => GpaState());
+final calendarProvider = ChangeNotifierProvider((ref) => CalendarState());
 
-// Mascot mood — stats ve pomodoro'dan türetiliyor, kendi state'i yok
 final mascotMoodProvider = Provider((ref) {
   final pomodoro = ref.watch(pomodoroProvider);
   final stats = ref.watch(statsProvider);

@@ -25,6 +25,14 @@ class StatsState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void loadFromStorage(Map raw) {
+    for (final day in weeklyData) {
+      final saved = raw[day.label];
+      if (saved != null) day.minutes = saved as int;
+    }
+    notifyListeners();
+  }
+
   int get streak {
     int count = 0;
     for (final d in weeklyData.reversed) {
