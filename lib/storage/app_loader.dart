@@ -7,7 +7,9 @@ import '../state/stats_state.dart';
 import '../models/course_model.dart';
 import '../models/event_model.dart';
 
-final appLoaderProvider = FutureProvider<void>((ref) async {
+// keepAlive ile provider yeniden çalışmaz
+final appLoaderProvider = FutureProvider.autoDispose<void>((ref) async {
+  ref.keepAlive();
   await _loadGpa(ref.read(gpaProvider));
   await _loadCalendar(ref.read(calendarProvider));
   await _loadStats(ref.read(statsProvider));

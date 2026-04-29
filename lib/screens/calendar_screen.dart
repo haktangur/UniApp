@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../state/app_state.dart';
 import '../state/calendar_state.dart';
 import '../theme/pixel_theme.dart';
 import '../widgets/pixel_button.dart';
 
 enum CalendarView { day, month, year }
 
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  final CalendarState _state = CalendarState();
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   final _controller = TextEditingController();
   late DateTime _viewMonth;
   int _viewYear = DateTime.now().year;
@@ -38,12 +39,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   void initState() {
     super.initState();
     _viewMonth = DateTime(DateTime.now().year, DateTime.now().month);
-    _state.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
-    _state.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -61,7 +60,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return days;
   }
 
-  void _showAddEvent() {
+  void _showAddEvent(CalendarState state) {
     _controller.clear();
     showDialog(
       context: context,
@@ -96,7 +95,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           TextButton(
             onPressed: () {
-              _state.addEvent(_state.selectedDay, _controller.text);
+              state.addEvent(state.selectedDay, _controller.text);
               Navigator.pop(context);
             },
             child: const Text(
@@ -109,12 +108,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // ── GÖRÜNÜMLER ──────────────────────────────────────────
-
   Widget _buildYearView() {
     final now = DateTime.now();
     final years = List.generate(21, (i) => now.year - 10 + i);
-
     return Column(
       children: [
         const SizedBox(height: 8),
@@ -215,13 +211,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildDayView() {
+  Widget _buildDayView(CalendarState state) {
     final days = _buildDays();
-    final events = _state.eventsFor(_state.selectedDay);
+    final events = state.eventsFor(state.selectedDay);
 
     return Column(
       children: [
-        // Gün başlıkları
         Row(
           children: ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct']
               .map(
@@ -240,7 +235,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               .toList(),
         ),
         const SizedBox(height: 8),
-        // Takvim grid
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -254,17 +248,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
             final day = days[i];
             if (day == null) return const SizedBox();
             final isSelected =
-                day.day == _state.selectedDay.day &&
-                day.month == _state.selectedDay.month &&
-                day.year == _state.selectedDay.year;
+                day.day == state.selectedDay.day &&
+                day.month == state.selectedDay.month &&
+                day.year == state.selectedDay.year;
             final isToday =
                 day.day == DateTime.now().day &&
                 day.month == DateTime.now().month &&
                 day.year == DateTime.now().year;
-            final hasEvent = _state.hasEvents(day);
+            final hasEvent = state.hasEvents(day);
 
             return GestureDetector(
-              onTap: () => _state.selectDay(day),
+              onTap: () => state.selectDay(day),
               child: Container(
                 decoration: BoxDecoration(
                   color: isSelected
@@ -301,22 +295,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
           },
         ),
         const SizedBox(height: 16),
-        // Etkinlik başlığı
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${_state.selectedDay.day} ${_months[_state.selectedDay.month - 1]}',
+              '${state.selectedDay.day} ${_months[state.selectedDay.month - 1]}',
               style: const TextStyle(
                 color: PixelTheme.textSecondary,
                 fontSize: 12,
               ),
             ),
-            PixelButton(label: '+ ETKİNLİK', onTap: _showAddEvent),
+            PixelButton(label: '+ ETKİNLİK', onTap: () => _showAddEvent(state)),
           ],
         ),
         const SizedBox(height: 8),
-        // Etkinlik listesi
         Expanded(
           child: events.isEmpty
               ? const Center(
@@ -351,8 +343,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () =>
-                              _state.removeEvent(_state.selectedDay, i),
+                          onTap: () => state.removeEvent(state.selectedDay, i),
                           child: const Icon(
                             Icons.close,
                             color: PixelTheme.danger,
@@ -367,8 +358,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ],
     );
   }
-
-  // ── BAŞLIK ───────────────────────────────────────────────
 
   Widget _buildHeader() {
     String title;
@@ -429,6 +418,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(calendarProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PixelTheme.background,
@@ -464,7 +455,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             const SizedBox(height: 12),
             Expanded(
               child: _view == CalendarView.day
-                  ? _buildDayView()
+                  ? _buildDayView(state)
                   : _view == CalendarView.month
                   ? _buildMonthView()
                   : _buildYearView(),
