@@ -45,6 +45,8 @@ class _MascotWidgetState extends ConsumerState<MascotWidget>
         return ('(T_T)', '> Çalışmaya başla!', PixelTheme.danger);
       case MascotMood.idle:
         return ('(^_^)', _greeting(), PixelTheme.primary);
+      case MascotMood.resting:
+        return ('(ᴗ˳ᴗ)', '> Mola zamanı~', PixelTheme.secondary);
     }
   }
 
