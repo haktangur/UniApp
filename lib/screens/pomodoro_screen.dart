@@ -1,34 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../state/app_state.dart';
 import '../state/pomodoro_state.dart';
 import '../widgets/pixel_button.dart';
 import '../widgets/pixel_progress_bar.dart';
 import '../theme/pixel_theme.dart';
 
-class PomodoroScreen extends StatefulWidget {
+class PomodoroScreen extends ConsumerWidget {
   const PomodoroScreen({super.key});
 
   @override
-  State<PomodoroScreen> createState() => _PomodoroScreenState();
-}
-
-class _PomodoroScreenState extends State<PomodoroScreen> {
-  final PomodoroState _state = PomodoroState();
-
-  @override
-  void initState() {
-    super.initState();
-    _state.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _state.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isFocus = _state.mode == PomodoroMode.focus;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(pomodoroProvider);
+    final isFocus = state.mode == PomodoroMode.focus;
     final bgColor = isFocus ? PixelTheme.background : const Color(0xFF0D1A0D);
     final accentColor = isFocus ? PixelTheme.primary : PixelTheme.secondary;
 
@@ -52,7 +36,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              _state.timeString,
+              state.timeString,
               style: TextStyle(
                 color: accentColor,
                 fontSize: 72,
@@ -61,21 +45,21 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            PixelProgressBar(progress: _state.progress),
+            PixelProgressBar(progress: state.progress),
             const SizedBox(height: 48),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 PixelButton(
-                  label: _state.isRunning ? 'DURDUR' : 'BAŞLAT',
+                  label: state.isRunning ? 'DURDUR' : 'BAŞLAT',
                   color: accentColor,
-                  onTap: _state.isRunning ? _state.pause : _state.start,
+                  onTap: state.isRunning ? state.pause : state.start,
                 ),
                 const SizedBox(width: 16),
                 PixelButton(
                   label: 'SIFIRLA',
                   color: PixelTheme.textSecondary,
-                  onTap: _state.reset,
+                  onTap: state.reset,
                 ),
               ],
             ),

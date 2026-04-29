@@ -1,8 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../state/app_state.dart';
 import '../theme/pixel_theme.dart';
 
-class MascotWidget extends StatelessWidget {
+class MascotWidget extends ConsumerStatefulWidget {
   const MascotWidget({super.key});
+
+  @override
+  ConsumerState<MascotWidget> createState() => _MascotWidgetState();
+}
+
+class _MascotWidgetState extends ConsumerState<MascotWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _bounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+
+    _bounce = Tween<double>(
+      begin: 0,
+      end: 6,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  (String, String, Color) _moodData(MascotMood mood) {
+    switch (mood) {
+      case MascotMood.focusing:
+        return ('(-_-)', '> Odaklanıyorum...', PixelTheme.secondary);
+      case MascotMood.happy:
+        return ('(^o^)', '> Harika gidiyorsun!', PixelTheme.accent);
+      case MascotMood.sad:
+        return ('(T_T)', '> Çalışmaya başla!', PixelTheme.danger);
+      case MascotMood.idle:
+        return ('(^_^)', _greeting(), PixelTheme.primary);
+    }
+  }
 
   String _greeting() {
     final hour = DateTime.now().hour;
@@ -13,22 +57,39 @@ class MascotWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          '(^_^)',
-          style: TextStyle(color: PixelTheme.primary, fontSize: 32),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _greeting(),
-          style: const TextStyle(
-            color: PixelTheme.textSecondary,
-            fontSize: 14,
-            letterSpacing: 1,
+    final mood = ref.watch(mascotMoodProvider);
+    final (face, text, color) = _moodData(mood);
+
+    return AnimatedBuilder(
+      animation: _bounce,
+      builder: (context, child) {
+        final shouldBounce =
+            mood == MascotMood.happy || mood == MascotMood.focusing;
+        return Transform.translate(
+          offset: Offset(0, shouldBounce ? -_bounce.value : 0),
+          child: child,
+        );
+      },
+      child: Column(
+        children: [
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 400),
+            style: TextStyle(color: color, fontSize: 32, fontFamily: 'Courier'),
+            child: Text(face),
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 400),
+            style: TextStyle(
+              color: color.withOpacity(0.8),
+              fontSize: 13,
+              fontFamily: 'Courier',
+              letterSpacing: 1,
+            ),
+            child: Text(text),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -5,12 +5,13 @@ import 'pomodoro_screen.dart';
 import 'gpa_screen.dart';
 import 'calendar_screen.dart';
 import 'stats_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cards = [
       {'title': 'GPA', 'icon': '📊', 'preview': 'Not hesapla'},
       {'title': 'Pomodoro', 'icon': '🍅', 'preview': 'Odaklan'},

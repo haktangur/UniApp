@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'theme/pixel_theme.dart';
 import 'screens/dashboard_screen.dart';
 
 void main() {
-  runApp(const UniApp());
+  runApp(const ProviderScope(child: UniApp()));
 }
 
 class UniApp extends StatelessWidget {
