@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/event_model.dart';
+import '../storage/storage_service.dart';
 
 class CalendarState extends ChangeNotifier {
   DateTime selectedDay = DateTime.now();
@@ -9,10 +10,7 @@ class CalendarState extends ChangeNotifier {
 
   List<String> eventsFor(DateTime d) => _events[_key(d)] ?? [];
 
-  void selectDay(DateTime d) {
-    selectedDay = d;
-    notifyListeners();
-  }
+  bool hasEvents(DateTime d) => eventsFor(d).isNotEmpty;
 
   void loadFromStorage(List<EventModel> loaded) {
     _events.clear();
@@ -22,16 +20,31 @@ class CalendarState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void selectDay(DateTime d) {
+    selectedDay = d;
+    notifyListeners();
+  }
+
   void addEvent(DateTime d, String title) {
     if (title.trim().isEmpty) return;
     _events.putIfAbsent(_key(d), () => []).add(title.trim());
+    _save();
     notifyListeners();
   }
 
   void removeEvent(DateTime d, int index) {
     _events[_key(d)]?.removeAt(index);
+    _save();
     notifyListeners();
   }
 
-  bool hasEvents(DateTime d) => eventsFor(d).isNotEmpty;
+  void _save() {
+    final list = <Map>[];
+    for (final entry in _events.entries) {
+      for (final title in entry.value) {
+        list.add(EventModel(title: title, dateKey: entry.key).toMap());
+      }
+    }
+    StorageService.calendar.put('events', list);
+  }
 }
